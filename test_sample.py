@@ -4,7 +4,7 @@ from python_org_page import PythonOrgPage
 @pytest.mark.parametrize("keyword, should_have_results", [
     ("pycon", True),
     ("selenium", True),
-    ("zzzz_no_result_keyword_12345", True),
+    ("zzzz_no_result_keyword_12345", False),
 ])
 def test_python_search(driver, keyword, should_have_results):
     page = PythonOrgPage(driver)
