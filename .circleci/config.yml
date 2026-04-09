@@ -32,7 +32,11 @@ jobs:
 
       - run:
           name: Run tests
-          command: pytest
+          command: 
+            mkdir -p test-results
+            pytest --junitxml=test-results/results.xml
+      - store_test_results:
+          path: test-results
 
 workflows:
   build_and_test:
