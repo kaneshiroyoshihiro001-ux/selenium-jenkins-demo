@@ -4,6 +4,8 @@ jobs:
   build:
     docker:
       - image: cimg/python:3.11
+      - image: selenium/standalone-chrome
+        name: chrome
     working_directory: ~/project
     steps:
       - checkout
@@ -15,6 +17,20 @@ jobs:
             pip install pytest selenium
 
       - run:
+          name: Wait for Selenium
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y curl
+            for i in {1..30}; do
+              if curl -s http://chrome:4444/wd/hub/status | grep -q '"ready":true'; then
+                echo "Selenium is ready"
+                break
+              fi
+              echo "Waiting for Selenium..."
+              sleep 2
+            done
+
+      - run:
           name: Run tests
           command: pytest
 
@@ -22,4 +38,3 @@ workflows:
   build_and_test:
     jobs:
       - build
-
