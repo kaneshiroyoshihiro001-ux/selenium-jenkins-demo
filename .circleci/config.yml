@@ -32,9 +32,10 @@ jobs:
 
       - run:
           name: Run tests
-          command: 
+          command: |
             mkdir -p test-results
             pytest --junitxml=test-results/results.xml
+
       - store_test_results:
           path: test-results
 
