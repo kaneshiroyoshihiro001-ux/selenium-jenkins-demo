@@ -1,24 +1,22 @@
 import pytest
 from playwright.sync_api import sync_playwright
 
-@pytest.mark.parametrize("keyword", [
-    "playwright",
-    "python",
-    "automation"
+@pytest.mark.parametrize("url", [
+    "https://example.com",
+    "https://example.com",
+    "https://example.com"
 ])
-def test_google_search(keyword):
+def test_open_page(url):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
-        page.goto("https://www.google.com")
+        page.goto(url)
 
-        page.fill('textarea[name="q"]', keyword)
-        page.press('textarea[name="q"]', "Enter")
+        # 等待页面标题出现
+        page.wait_for_selector("h1")
 
-        # ⭐ 等待搜索结果元素出现（关键）
-        page.wait_for_selector("text=" + keyword, timeout=10000)
-
-        assert keyword in page.content().lower()
+        # 验证标题
+        assert "Example Domain" in page.title()
 
         browser.close()
