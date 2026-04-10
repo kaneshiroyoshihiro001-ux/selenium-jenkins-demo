@@ -1,38 +1,24 @@
 import pytest
-from playwright.sync_api import Page, sync_playwright
-
-
-class GooglePage:
-    def __init__(self, page: Page):
-        self.page = page
-
-    def open(self) -> None:
-        self.page.goto("https://www.google.com")
-
-    def search(self, keyword: str) -> None:
-        self.page.fill('textarea[name="q"]', keyword)
-        self.page.press('textarea[name="q"]', "Enter")
-
-    def has_keyword(self, keyword: str) -> bool:
-        return keyword.lower() in self.page.content().lower()
-
+from playwright.sync_api import sync_playwright
 
 @pytest.mark.parametrize("keyword", [
     "playwright",
     "python",
-    "automation",
+    "automation"
 ])
-def test_google_search(keyword: str) -> None:
+def test_google_search(keyword):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
-        google_page = GooglePage(page)
-        google_page.open()
-        google_page.search(keyword)
+        page.goto("https://www.google.com")
 
-        page.wait_for_timeout(3000)
+        page.fill('textarea[name="q"]', keyword)
+        page.press('textarea[name="q"]', "Enter")
 
-        assert google_page.has_keyword(keyword)
+        # ⭐ 等待搜索结果元素出现（关键）
+        page.wait_for_selector("text=" + keyword, timeout=10000)
+
+        assert keyword in page.content().lower()
 
         browser.close()
