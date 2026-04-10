@@ -1,12 +1,12 @@
 version: 2.1
 
 jobs:
-  build:
+  test:
     docker:
       - image: cimg/python:3.11
-      - image: selenium/standalone-chrome
-        name: chrome
+
     working_directory: ~/project
+
     steps:
       - checkout
 
@@ -14,32 +14,19 @@ jobs:
           name: Install dependencies
           command: |
             python -m pip install --upgrade pip
-            pip install pytest selenium
+            pip install pytest playwright
 
       - run:
-          name: Wait for Selenium
+          name: Install Playwright browsers
           command: |
-            sudo apt-get update
-            sudo apt-get install -y curl
-            for i in {1..30}; do
-              if curl -s http://chrome:4444/wd/hub/status | grep -q '"ready":true'; then
-                echo "Selenium is ready"
-                break
-              fi
-              echo "Waiting for Selenium..."
-              sleep 2
-            done
+            python -m playwright install chromium
 
       - run:
           name: Run tests
           command: |
-            mkdir -p test-results
-            pytest --junitxml=test-results/results.xml
-
-      - store_test_results:
-          path: test-results
+            pytest -s test_playwright.py
 
 workflows:
-  build_and_test:
+  playwright_test:
     jobs:
-      - build
+      - test
