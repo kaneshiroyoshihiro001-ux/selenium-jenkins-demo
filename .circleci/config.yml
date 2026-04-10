@@ -30,3 +30,4 @@ workflows:
   playwright_test:
     jobs:
       - test
+ 
